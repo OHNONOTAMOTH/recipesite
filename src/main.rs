@@ -16,5 +16,5 @@ async fn main() {
             .query::<String>(&mut con)
             .unwrap()
     );*/
-    println!("{:?}", search::search("test", con).unwrap());
+    println!("{:?}", search::search("test", con).await.unwrap());
 }
