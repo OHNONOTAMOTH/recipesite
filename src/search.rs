@@ -1,6 +1,8 @@
 use redis::*;
+use tokio::*;
 
-pub fn search(title: &str, mut con: Connection) -> Result<Vec<String>, RedisError> {
+#[tokio::main]
+pub async fn search(title: &str, mut con: Connection) -> Result<Vec<String>, RedisError> {
     let result = redis::cmd("ft.sugget")
         .arg("recipesearch")
         .arg(title)
