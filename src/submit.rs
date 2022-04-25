@@ -4,18 +4,20 @@ use std::io::{Write, Error};
 
 pub async fn submittosearch(
     mut con: Connection,
-    title: &'static str,
-    contents: &'static str,
+    title: &str,
+    contents: &str,
 ) -> Result<(), Error> {
+    //  create database entry
     let _: Result<(), RedisError> = redis::cmd("ft.sugadd")
-        .arg("recipes")
+        .arg("recipesearch")
         .arg(title)
+        .arg("1")
         .query(&mut con);
     
         //let _: () = con.set(title, path).unwrap();
+    //  create file
+    let mut file = File::create("files/".to_owned() + title + ".md").unwrap();
 
-    let mut file = File::create(title.to_owned().remove_matches("<") + ".md").unwrap();
-
-    file.write_all(&contents.as_bytes())
+    //  write to file
+    file.write_all(&str::replace(&str::replace(&contents, "<", "&#60"), ">", "&#62").as_bytes())
 }
-

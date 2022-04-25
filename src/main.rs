@@ -1,7 +1,8 @@
 use redis::*;
 use json::*;
 use rocket::*;
-use rocket::response::content::Json;
+use rocket::response::content::{Json, Custom};
+use rocket::http::ContentType;
 
 pub mod search;
 pub mod submit;
@@ -15,12 +16,12 @@ async fn rocket() -> _ {
   //println!("{:?}", search::search("test", con).await.unwrap());\
   
   //  start server
-  rocket::build().mount("/", routes![route])
+  rocket::build().mount("/", routes![servesearchres, submittorest])
 }
 
 //  rest api for searching db
 #[get("/search/<url>")]
-async fn route(url: &str) -> Json<String> {
+async fn servesearchres(url: &str) -> Json<String> {
   //  creates connection
   let client = redis::Client::open(ADDR).unwrap();
   let con = client.get_connection().unwrap();
@@ -32,4 +33,14 @@ async fn route(url: &str) -> Json<String> {
   response::content::Json(json::stringify(object! {
     results: results.unwrap()
   }))
+}
+
+#[get("/submit/<name>/<content>")]
+async fn submittorest(name: &str, content: &str) -> Custom<String> {
+  //  creates connection
+  let client = redis::Client::open(ADDR).unwrap();
+  let con = client.get_connection().unwrap();
+
+  submit::submittosearch(con, name, content).await;
+  response::content::Custom(ContentType::Text, "done".to_owned())
 }
