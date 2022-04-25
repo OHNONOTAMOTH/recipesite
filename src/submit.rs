@@ -1,16 +1,21 @@
 use redis::*;
-use tokio::*;
+use std::fs::File;
+use std::io::{Write, Error};
 
-#[tokio::main]
 pub async fn submittosearch(
     mut con: Connection,
     title: &'static str,
-    path: &'static str,
-) -> Result<&'static str, &'static str> {
+    contents: &'static str,
+) -> Result<(), Error> {
     let _: Result<(), RedisError> = redis::cmd("ft.sugadd")
         .arg("recipes")
         .arg(title)
         .query(&mut con);
-    let _: () = con.set(title, path).unwrap();
-    Ok("did it")
+    
+        //let _: () = con.set(title, path).unwrap();
+
+    let mut file = File::create(title.to_owned() + ".md").unwrap();
+
+    file.write_all(&contents.as_bytes())
 }
+

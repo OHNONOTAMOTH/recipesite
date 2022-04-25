@@ -1,5 +1,4 @@
 use redis::*;
-use tokio::*;
 
 pub async fn search(title: &str, mut con: Connection) -> Result<Vec<String>, RedisError> {
     let result = redis::cmd("ft.sugget")
