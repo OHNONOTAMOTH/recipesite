@@ -14,7 +14,7 @@ pub async fn submittosearch(
     
         //let _: () = con.set(title, path).unwrap();
 
-    let mut file = File::create(title.to_owned() + ".md").unwrap();
+    let mut file = File::create(title.to_owned().remove_matches("<") + ".md").unwrap();
 
     file.write_all(&contents.as_bytes())
 }
