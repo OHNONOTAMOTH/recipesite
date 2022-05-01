@@ -20,7 +20,7 @@ async fn rocket() -> _ {
 }
 
 //  rest api for searching db
-#[get("/search/<url>")]
+#[get("/apisearch/<url>")]
 async fn servesearchres(url: &str) -> Json<String> {
   //  creates connection
   let client = redis::Client::open(ADDR).unwrap();
