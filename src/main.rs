@@ -3,7 +3,6 @@ use json::*;
 use rocket::*;
 use rocket::response::content::{Json, Custom};
 use rocket::http::ContentType;
-use rocket_cors::{AllowedOrigins, CorsOptions};
 
 pub mod search;
 pub mod submit;
