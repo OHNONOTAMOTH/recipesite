@@ -6,6 +6,7 @@ use rocket::http::ContentType;
 
 pub mod search;
 pub mod submit;
+pub mod get;
 
 const ADDR: &str = "redis://127.0.0.1";
 
@@ -40,7 +41,7 @@ async fn rocket() -> _ {
   //println!("{:?}", search::search("test", con).await.unwrap());\
 
   //  start server
-  rocket::build().attach(CORS).mount("/", routes![servesearchres, submittorest])
+  rocket::build().attach(CORS).mount("/", routes![servesearchres, submittorest, getrest])
 }
 
 //  rest api for searching db
@@ -61,10 +62,23 @@ async fn servesearchres(url: &str) -> Json<String> {
 
 #[get("/submit/<name>/<content>")]
 async fn submittorest(name: &str, content: &str) -> Custom<String> {
-  //  creates connection
   let client = redis::Client::open(ADDR).unwrap();
   let con = client.get_connection().unwrap();
 
   submit::submittosearch(con, name, content).await;
   response::content::Custom(ContentType::Text, "done".to_owned())
+}
+
+#[get("/recipes/<p>")]
+async fn getrest(p: &str) -> Json<String> {
+  let client = redis::Client::open(ADDR).unwrap();
+  let con = client.get_connection().unwrap();
+
+  response::content::Json(
+    json::stringify( 
+      object! {
+        recipe: get::get(p, con).await.unwrap()
+      }
+    )
+  )
 }
